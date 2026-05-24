@@ -20,7 +20,7 @@ const csp = [
   "default-src 'self'",
   isDev
     ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-    : "script-src 'self'",
+    : "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline'",           // MUI + Tailwind inline styles
   "font-src 'self' data:",
   "img-src 'self' res.cloudinary.com data: blob:",
@@ -60,10 +60,11 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1';
     return [
       {
         source: '/api/backend/:path*',
-        destination: 'http://localhost:3001/api/v1/:path*',
+        destination: `${backendUrl}/:path*`,
       },
     ];
   },
