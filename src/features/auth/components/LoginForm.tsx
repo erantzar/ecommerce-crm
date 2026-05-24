@@ -1,21 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { useAppDispatch } from '@/core/store/hooks';
 import { useAuth } from '../hooks/useAuth';
-import { verify2FAThunk, fetchMeThunk } from '../store/authThunks';
+import { verify2FAThunk } from '../store/authThunks';
 
 export default function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const dispatch = useAppDispatch();
   const { twoFAStep, userId, status, error, adminLogin, verify2FA } = useAuth();
 
   const [email, setEmail] = useState('');
@@ -34,16 +31,16 @@ export default function LoginForm() {
     if (!userId) return;
     const result = await verify2FA({ userId, code });
     if (verify2FAThunk.fulfilled.match(result as never)) {
-      // Token is now in localStorage — fetch the user profile before navigating
-      // so currentUser is populated the moment the dashboard renders.
-      await dispatch(fetchMeThunk());
       toast.success('Logged in successfully');
       // Honour the ?redirect= param set by the 401 interceptor — admin lands
       // back on the page they were on when their session expired.
       // Guard: only follow relative paths to prevent open-redirect attacks.
       const raw = searchParams.get('redirect') ?? '/';
       const redirectTo = raw.startsWith('/') && !raw.startsWith('//') ? raw : '/';
-      router.push(redirectTo);
+      // Hard navigation: ensures the browser sends the freshly-set cookie to
+      // the middleware on a clean request, and bootstrapAdminThunk re-runs on
+      // the new page mount to populate currentUser in Redux.
+      window.location.href = redirectTo;
     }
   }
 
