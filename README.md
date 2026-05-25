@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# E-Commerce CRM Dashboard
 
-## Getting Started
+> Internal admin panel for managing users, products, and orders.
+> **Live:** `https://your-crm.vercel.app` · **Repo:** private
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Overview
+
+Next.js 15 operational dashboard restricted to admin-role accounts. Provides real-time metrics, user role management, product CRUD with Cloudinary image uploads, order lifecycle control, and revenue analytics. Secured with strict CSP headers and JWT-gated API access.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 15 (App Router, Turbopack) |
+| Language | TypeScript (strict) |
+| State | Redux Toolkit |
+| Data tables | MUI DataGrid (X) |
+| Charts | Recharts |
+| Styling | Tailwind CSS + MUI theming |
+| Security | CSP headers, X-Frame-Options: DENY |
+| Testing | Vitest |
+| Package manager | pnpm |
+
+---
+
+## Environment Variables
+
+Create `.env.local` in the project root — **never commit this file.**
+
+```env
+# Backend API — requests are proxied through Next.js rewrites (/api/backend/*)
+NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Local Development
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# 1. Clone and enter the project
+git clone <repo-url>
+cd ecommerce-crm
 
-## Learn More
+# 2. Install dependencies
+pnpm install
 
-To learn more about Next.js, take a look at the following resources:
+# 3. Copy and fill environment variables
+cp .env.example .env.local
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# 4. Start development server
+pnpm dev
+# → CRM at http://localhost:3002
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Other Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+pnpm build        # Production build
+pnpm start        # Serve production build on port 3002
+pnpm type-check   # Static type analysis
+pnpm test         # Run Vitest unit tests
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Key Features
+
+- **Dashboard** — live stats: total users, products, pending orders, estimated revenue (cancelled orders excluded)
+- **Users** — view all accounts, change roles (customer ↔ admin), delete users
+- **Products** — full CRUD with Cloudinary image upload, category/search filtering, activate/deactivate toggle
+- **Orders** — paginated order list with status badges, cancel pending orders, detail view per order
+- **Profile** — admin account info and sign-out
+- **Mobile responsive** — collapsible sidebar drawer on mobile, adaptive DataGrid column visibility
+
+---
+
+## Demo Credentials
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | eran.tzar@gmail.com | Test1234 |
+
+> Only `admin`-role accounts can access the CRM. Customer accounts are redirected to login.
