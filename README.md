@@ -85,5 +85,6 @@ pnpm test         # Run Vitest unit tests
 | Role | Email | Password |
 |---|---|---|
 | Admin | eran.tzar@gmail.com | Test1234 |
+| Admin | ben.somthing.com | Test1234 |
 
 > Only `admin`-role accounts can access the CRM. Customer accounts are redirected to login.
