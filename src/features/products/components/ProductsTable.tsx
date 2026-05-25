@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { DataGrid, type GridColDef, type GridPaginationModel } from '@mui/x-data-grid';
+import { DataGrid, type GridColDef, type GridPaginationModel, type GridColumnVisibilityModel } from '@mui/x-data-grid';
 import Image from 'next/image';
 import { toast } from 'sonner';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useIsMobile } from '@/lib/hooks';
 import ProductForm from './ProductForm';
 import { useProducts } from '../hooks/useProducts';
 import {
@@ -40,6 +41,7 @@ export default function ProductsTable() {
   const [formOpen, setFormOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<Product | null>(null);
   const [searchInput, setSearchInput] = useState('');
+  const isMobile = useIsMobile();
 
   const isLoading = listStatus === 'loading';
 
@@ -183,6 +185,11 @@ export default function ProductsTable() {
     },
   ];
 
+  // Hide non-essential columns on mobile to prevent horizontal overflow
+  const columnVisibilityModel: GridColumnVisibilityModel = isMobile
+    ? { category: false, stock: false }
+    : {};
+
   if (isLoading && products.length === 0) {
     return (
       <div className="space-y-2">
@@ -197,18 +204,18 @@ export default function ProductsTable() {
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3">
-        <form onSubmit={handleSearch} className="flex gap-2">
+        <form onSubmit={handleSearch} className="flex w-full gap-2 sm:w-auto">
           <Input
             placeholder="Search products…"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="w-52"
+            className="w-full sm:w-52"
           />
           <Button type="submit" variant="outline" size="sm">Search</Button>
         </form>
 
         <Select onValueChange={handleCategoryChange} defaultValue="all">
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-full sm:w-40">
             <SelectValue placeholder="Category" />
           </SelectTrigger>
           <SelectContent>
@@ -219,15 +226,15 @@ export default function ProductsTable() {
           </SelectContent>
         </Select>
 
-        <div className="ml-auto">
-          <Button onClick={() => { setEditTarget(null); setFormOpen(true); }}>
+        <div className="w-full sm:w-auto sm:ml-auto">
+          <Button className="w-full sm:w-auto" onClick={() => { setEditTarget(null); setFormOpen(true); }}>
             + New Product
           </Button>
         </div>
       </div>
 
       {/* DataGrid */}
-      <div className="rounded-lg border bg-card overflow-hidden">
+      <div className="rounded-lg border bg-card overflow-x-auto">
         <DataGrid
           rows={products}
           columns={columns}
@@ -243,6 +250,7 @@ export default function ProductsTable() {
           loading={isLoading}
           disableRowSelectionOnClick
           autoHeight
+          columnVisibilityModel={columnVisibilityModel}
           sx={{ border: 'none' }}
         />
       </div>
@@ -257,4 +265,3 @@ export default function ProductsTable() {
     </div>
   );
 }
-

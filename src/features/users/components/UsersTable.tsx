@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useMemo } from 'react';
-import { DataGrid, type GridColDef } from '@mui/x-data-grid';
+import { DataGrid, type GridColDef, type GridColumnVisibilityModel } from '@mui/x-data-grid';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAppSelector } from '@/core/store/hooks';
+import { useIsMobile } from '@/lib/hooks';
 import { useUsers } from '../hooks/useUsers';
 import { updateUserRole as updateUserRoleThunk, deleteUser as deleteUserThunk } from '../store/usersThunks';
 import type { AdminUser, UserRole } from '@/types';
@@ -17,6 +18,7 @@ export default function UsersTable() {
   const { users, status, updateUserRole, deleteUser } = useUsers();
   const currentUser = useAppSelector((s) => s.auth.currentUser);
   const currentUserId = currentUser?._id ?? null;
+  const isMobile = useIsMobile();
 
   const isLoading = status === 'loading';
 
@@ -150,6 +152,11 @@ export default function UsersTable() {
     },
   ], [currentUserId, handleRoleChange, handleDelete]);
 
+  // Hide non-essential columns on mobile to prevent horizontal overflow
+  const columnVisibilityModel: GridColumnVisibilityModel = isMobile
+    ? { email: false, createdAt: false }
+    : {};
+
   if (isLoading && users.length === 0) {
     return (
       <div className="space-y-2">
@@ -159,7 +166,7 @@ export default function UsersTable() {
   }
 
   return (
-    <div className="rounded-lg border bg-card overflow-hidden">
+    <div className="rounded-lg border bg-card overflow-x-auto">
       <DataGrid
         rows={users}
         columns={columns}
@@ -169,9 +176,9 @@ export default function UsersTable() {
         loading={isLoading}
         disableRowSelectionOnClick
         autoHeight
+        columnVisibilityModel={columnVisibilityModel}
         sx={{ border: 'none' }}
       />
     </div>
   );
 }
-

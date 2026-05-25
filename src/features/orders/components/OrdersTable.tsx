@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { DataGrid, GridToolbar, type GridColDef, type GridPaginationModel } from '@mui/x-data-grid';
+import { DataGrid, GridToolbar, type GridColDef, type GridPaginationModel, type GridColumnVisibilityModel } from '@mui/x-data-grid';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useIsMobile } from '@/lib/hooks';
 import StatusBadge from './StatusBadge';
 import { useOrders } from '../hooks/useOrders';
 import { cancelOrder as cancelOrderThunk } from '../store/ordersThunks';
@@ -15,6 +16,7 @@ export default function OrdersTable() {
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const isMobile = useIsMobile();
 
   const {
     orders,
@@ -109,6 +111,11 @@ export default function OrdersTable() {
     },
   ];
 
+  // Hide verbose columns on mobile to prevent horizontal overflow
+  const columnVisibilityModel: GridColumnVisibilityModel = isMobile
+    ? { user: false, paymentMethod: false, createdAt: false }
+    : {};
+
   if (isLoading && orders.length === 0) {
     return (
       <div className="space-y-2">
@@ -118,7 +125,7 @@ export default function OrdersTable() {
   }
 
   return (
-    <div className="rounded-lg border bg-card overflow-hidden">
+    <div className="rounded-lg border bg-card overflow-x-auto">
       <DataGrid
         rows={orders}
         columns={columns}
@@ -133,11 +140,12 @@ export default function OrdersTable() {
         disableColumnResize
         disableColumnMenu
         autoHeight
-        slots={{ toolbar: GridToolbar }}
-        slotProps={{ toolbar: { showQuickFilter: false } }}
+        columnVisibilityModel={columnVisibilityModel}
+        // Hide the heavy GridToolbar on mobile — takes up space with no mobile styling
+        slots={isMobile ? {} : { toolbar: GridToolbar }}
+        slotProps={isMobile ? {} : { toolbar: { showQuickFilter: false } }}
         sx={{ border: 'none' }}
       />
     </div>
   );
 }
-

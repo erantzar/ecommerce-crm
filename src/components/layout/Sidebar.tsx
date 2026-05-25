@@ -9,6 +9,7 @@ import {
   ShoppingCart,
   UserCircle,
   LogOut,
+  X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -24,13 +25,38 @@ const NAV_ITEMS = [
   { href: '/profile', label: 'Profile', icon: UserCircle },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { currentUser, logout } = useAuth();
 
   return (
-    <aside className="flex flex-col w-64 h-full border-r bg-card px-4 py-6 shrink-0">
-      <div className="mb-6 px-2">
+    <aside
+      className={cn(
+        // Base styles — always applied
+        'flex flex-col h-full border-r bg-card px-4 py-6 shrink-0 w-64',
+        // Mobile: fixed overlay drawer, off-screen by default
+        'fixed inset-y-0 left-0 z-30 transition-transform duration-200',
+        // Desktop: static column, always visible
+        'lg:static lg:translate-x-0',
+        // Toggle visibility on mobile
+        isOpen ? 'translate-x-0' : '-translate-x-full',
+      )}
+    >
+      {/* Mobile close button */}
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground lg:hidden"
+        aria-label="Close menu"
+      >
+        <X className="h-5 w-5" />
+      </button>
+
+      <div className="mb-6 px-2 pr-10 lg:pr-2">
         <span className="text-xl font-bold tracking-tight">CRM Admin</span>
       </div>
 
@@ -41,6 +67,7 @@ export default function Sidebar() {
             <Link
               key={href}
               href={href}
+              onClick={onClose}
               className={cn(
                 'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                 active
