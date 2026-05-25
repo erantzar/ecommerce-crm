@@ -42,7 +42,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1
 
 ```bash
 # 1. Clone and enter the project
-git clone <repo-url>
+git clone <https://github.com/erantzar/ecommerce-crm.git>
 cd ecommerce-crm
 
 # 2. Install dependencies
