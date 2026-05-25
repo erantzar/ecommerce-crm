@@ -1,7 +1,7 @@
 # E-Commerce CRM Dashboard
 
 > Internal admin panel for managing users, products, and orders.
-> **Live:** `https://your-crm.vercel.app` · **Repo:** private
+> **Live:** `ecommerce-cdp2sxnbv-eran-projects.vercel.app` · **Repo:** private
 
 ---
 
